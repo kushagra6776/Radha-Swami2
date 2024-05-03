@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IYC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    <div class="maincontainer">
+        <div class="top" ></div>
+        <!--Change image path, path to be corrected -->
+        <img style="height:100px;width:100px;" class="img" src="{{ url_for('static', filename='photos/IYC_LOGO.png') }}" alt="My Image"/>
+        <div class="lower"></div>
+    </div>
+    <div class="main">
+        <div style="text-align:center;">
+            <h1>Step 1: Select State</h1>
+            <br/>
+            <form method="POST" action="/">
+                <label for="state">Select State:</label>
+                <select class="st" name="state" id="state" required>
+                    <option selected="selected">State</option>
+                    {% for state in states_list %}
+                        <option value="{{ state }}">{{ state }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <input type="submit" name="submit_state" value="Next">
+            </form>
+        </div>
+    </div>
+    <footer class="footer" style="margin-top: 200px;">
+        <p>&copy; Copyright Indian Youth Congress. All rights reserved.</p>
+        <p class="sm">Designed by Tech Team at IYC</p>
+    </footer>
+</body>
+</html>

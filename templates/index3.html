@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IYC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    <div class="maincontainer">
+        <div class="top" ></div>
+        <!--Change image path, path to be corrected -->
+        <img style="height:100px;width:100px;" class="img" src="{{ url_for('static', filename='photos/IYC_LOGO.png') }}" alt="My Image"/>
+        <div class="lower"></div>
+    </div>
+    <div class="main">
+        <div style="text-align:center;">
+             <h1>Step 3: Select Vidhan Sabha</h1>
+                <form method="POST" action="/">
+                    <!-- Use either state or g.geo_app.state, not both -->
+                    <input type="hidden" name="state" value="{{ g.geo_app.state }}">
+                    <input type="hidden" name="pc_name" value="{{ g.geo_app.pc_name }}">
+                    <label for="ac_name">Select Vidhan Sabha:</label>
+                    <select class="st" name="ac_name" id="ac_name" required>
+                        <option select="selected">Assembly</option>
+                        {% for ac_name in ac_name_options %}
+                            <option value="{{ ac_name }}">{{ ac_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                    <input type="submit" name="submit_ac_name" value="Submit">
+                </form>
+        </div>
+    </div>
+    <footer class="footer" style="margin-top: 215px;">
+        <p>&copy; Copyright Indian Youth Congress. All rights reserved.</p>
+        <p class="sm">Designed by Tech Team at IYC</p>
+    </footer>
+</body>
+</html>

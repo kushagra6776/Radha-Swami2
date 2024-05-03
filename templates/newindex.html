@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Picker</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+
+<div>
+    <label for="ac_select">Select AC Name:</label>
+    <select id="ac_select" onchange="loadBooths()">
+        <option value="">Select AC Name</option>
+        <!-- AC Name options will be populated dynamically -->
+        {% for ac_name in ac_names %}
+        <option value ="{{ac_name}}">{{ ac_name }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<div>
+    <label for="booth_select">Select Booth Name:</label>
+    <select id="booth_select">
+        <option value="">Select Booth Name</option>
+    </select>
+</div>
+
+<button onclick="getLocation()">Submit</button>
+
+<script>
+function getUsername() {
+    // Check if the username is already stored in local storage
+    let username = localStorage.getItem('username');
+
+    if (!username) {
+        // If not, ask the user for their username
+        username = prompt('Enter your username:');
+
+        // Store the username in local storage
+        localStorage.setItem('username', username);
+    }
+
+    return username;
+}
+
+    function loadACNames() {
+        fetch("/load-ac-names")
+            .then(response => response.json())
+            .then(data => {
+                const acSelect = document.getElementById("ac_select");
+                acSelect.innerHTML = '<option value="">Select AC Name</option>';
+                data.forEach(acName => {
+                    const option = document.createElement("option");
+                    option.text = acName;
+                    option.value = acName;
+                    acSelect.add(option);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function loadBooths() {
+        const acSelect = document.getElementById("ac_select");
+        const selectedAc = acSelect.value;
+
+        if (!selectedAc) {
+            return;
+        }
+
+        fetch(`/load-booths/${selectedAc}`)
+            .then(response => response.json())
+            .then(data => {
+                const boothSelect = document.getElementById("booth_select");
+                boothSelect.innerHTML = '<option value="">Select Booth Name</option>';
+                data.forEach(boothName => {
+                    const option = document.createElement("option");
+                    option.text = boothName;
+                    option.value = boothName;
+                    boothSelect.add(option);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function getLocation() {
+        const acSelect = document.getElementById("ac_select");
+        const selectedAc = acSelect.value;
+        const boothSelect = document.getElementById("booth_select");
+        const selectedBooth = boothSelect.value;
+
+        if (!selectedAc || !selectedBooth) {
+            alert("Please select both AC Name and Booth Name.");
+            return;
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                sendLocation(position);
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function sendLocation(position) {
+        const username = getUsername();
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        const acSelect = document.getElementById("ac_select");
+        const selectedAc = acSelect.value;
+        const boothSelect = document.getElementById("booth_select");
+        const selectedBooth = boothSelect.value;
+
+        const locationData = {
+            user_id: username,
+            latitude: latitude,
+            longitude: longitude,
+            timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+            ac_name: selectedAc,
+            booth_name: selectedBooth
+        };
+
+        fetch("http://localhost:5000/save-location", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(locationData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred while sending the location data.");
+        });
+    }
+
+    // Load AC Names when the page loads
+    loadACNames();
+</script>
+
+</body>
+</html>
+
